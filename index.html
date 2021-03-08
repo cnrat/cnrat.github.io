@@ -1,0 +1,69 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="charset" content="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+  <link type="text/css" rel="stylesheet" href="css/custom.css" />
+  <script type="text/javascript" src="js/dom-to-image.min.js"></script>
+  <script type="text/javascript" src="js/FileSaver.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    function loadPageContent(container, htmlURL) {
+      $.ajax({
+        url: htmlURL,
+        dataType: "html",
+        async: false,
+        beforeSend: function () {
+          $("body").css("cursor", "wait");
+        },
+        success: function (html) {
+          $(container).fadeOut(500, function () {
+            $(this).html(html).fadeIn();
+          });
+          $("body").css("cursor", "default");
+        }
+      });
+    }
+  </script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142534009-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-142534009-1');
+  </script>
+
+</head>
+
+<body onload="">
+  <script type="text/javascript" src="js/bg_matrix.js"></script>
+  <br />
+  <div class="container" style="width:80%;">
+    <div id="pageHeader" class="clsHeader"></div>
+    <div id="pageNavi" class="clsNavi"></div>
+    <div id="pageContent" class="clsContent"></div>
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      loadPageContent('#pageHeader', 'header.html');
+      loadPageContent('#pageNavi', 'navi.html');
+      loadPageContent('#pageContent', 'attacksource.html');
+    })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+/*basic reset */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Page settings */
+
+html {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, #fff 0%, #aaa 100%) no-repeat;
+}
+
+body {
+  display: table;
+  background: black;
+  width: 100%;
+  height: 100%;
+  font-family: 'Yahei';
+}
+
+canvas {
+  display: block;
+}
+
+span {
+  font-family: monospace;
+  font-size: 1.5em;
+}
+
+@keyframes cursor {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.clsHeader {
+  z-index: 9999;
+  opacity: 0.85;
+  position: relative;
+}
+
+.clsNavi {
+  z-index: 999;
+  opacity: 0.95;
+  position: relative;
+}
+
+.clsContent {
+  z-index: 99;
+  opacity: 0.75;
+  position: relative;
+}
+
+.panel-body {
+  background-color: black;
+  color: white;
+}
+
+.disabled {
+  pointer-events: none;
+  cursor: default;
+}

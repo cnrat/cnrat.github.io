@@ -1,0 +1,124 @@
+<title>过去30日攻击检测 - 『ね』Security</title>
+
+<script type="text/javascript">
+  function OnGoogleChartAPILoaded() {
+    $.ajax({
+      url: "data/chartDatas.json?r=" + (new Date()).getTime(),
+      dataType: "json",
+      async: false,
+      success: function (jsonData) {
+        $.each(jsonData, function (chartName) {
+          var chartColor = "info"
+          var panel = $('#panel_tample').clone();
+          panel.css('display', '');
+          panel.attr('id', 'panel_' + chartName);
+          if (chartName == "Summary") {
+            panel.addClass('panel-success');
+          } else {
+            panel.addClass('panel-info');
+          }
+          panel.children('.panel-heading').children('.panel-title').attr('href', '#panel_collapse_' +
+            chartName);
+          panel.children('.panel-heading').children('.panel-title').html('' + chartName +
+            '&nbsp;(' + jsonData[chartName].lastupdate + ')');
+          panel.children('.panel-heading').children('.btn').attr('href', 'javascript:GetSummaryImage("' +
+            'panel_collapse_' + chartName + '")');
+          if (chartName == "Summary") {
+            panel.children('.panel-heading').children('.btn').show();
+          } else {
+            panel.children('.panel-heading').children('.btn').hide();
+          }
+          panel.children('.panel-collapse').attr('id', 'panel_collapse_' + chartName);
+          panel.children('.panel-collapse').children('.panel-body').children('.chart').attr('id', 'chart_' +
+            chartName);
+          $('#chartDiv').append(panel);
+          var chartData = google.visualization.arrayToDataTable(jsonData[chartName].data);
+          var chart = new google.visualization.LineChart(document.getElementById('chart_' + chartName));
+          chart.draw(chartData, chartOptions);
+          if (chartName != "Summary") {
+            $('#panel_collapse_' + chartName).removeClass('in');
+          }
+        });
+      }
+    });
+  }
+  google.charts.load('current', {
+    'packages': ['corechart'],
+    callback: OnGoogleChartAPILoaded
+  });
+</script>
+<script type="text/javascript">
+  $(document).on('shown.bs.collapse', '.collapse', function () {
+    $(this).parent().children('.panel-heading').find('.btn').fadeIn();
+  });
+  $(document).on('hide.bs.collapse', '.collapse', function () {
+    $(this).parent().children('.panel-heading').find('.btn').fadeOut();
+  });
+</script>
+<script type="text/javascript">
+  var chartOptions = {
+    vAxis: {
+      viewWindow: {
+        min: 0
+      },
+      textStyle: {
+        color: 'white'
+      },
+    },
+    hAxis: {
+      slantedText: true,
+      textStyle: {
+        color: 'white'
+      },
+    },
+    animation: {
+      duration: 1500,
+      easing: 'linear',
+      startup: true
+    },
+    legendTextStyle: {
+      color: 'white'
+    },
+    curveType: 'function',
+    legend: {
+      position: 'top'
+    },
+    backgroundColor: 'black',
+    chartArea: {
+      left: '7.5%',
+      width: '90%',
+      height: '65%'
+    }
+  };
+</script>
+<script type="text/javascript">
+  function GetSummaryImage(id) {
+    var node = document.getElementById(id);
+    domtoimage.toBlob(node).then(function (blob) {
+      saveAs(blob, $('#' + id).parent().children('.panel-heading').children('.panel-title').text().trim() +
+        '.png');
+    }).catch(function (error) {
+      // console.error('oops, something went wrong!', error);
+    });
+  }
+</script>
+
+<div class="row clearfix">
+  <div class="col-md-12 column">
+    <div id="chartDiv" class="panel-group">
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="panel_tample" style="display: none;">
+  <div class="panel-heading">
+    <a class='panel-title' data-toggle='collapse' data-parent='#chartDiv' href='#'>title</a>
+    <a class='btn btn-xs btn-info pull-right' href='#'>下载图片</a>
+  </div>
+  <div class="panel-collapse collapse in">
+    <div class="panel-body" style='height: 400px'>
+      <div class="chart" style="height: 100%; width: 100%; margin: 0;">
+      </div>
+    </div>
+  </div>
+</div>
