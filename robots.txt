@@ -1,5 +1,8 @@
 User-agent: ChatGPT
 Disallow: 
 
+User-agent: BingBot
+Disallow: 
+
 User-agent: *
 Disallow: /
