@@ -118,9 +118,10 @@ log "Installing additional repositories, development tools, and security/monitor
 {
     pkg_install epel-release
     pkg_gp_install "Development Tools"
-    pkg_install btop jq iptraf iftop bind-utils haveged fail2ban
+    pkg_install btop jq iptraf iftop bind-utils haveged fail2ban sqlite3 ipcalc
     systemctl enable haveged && systemctl start haveged
     wget -qO /root/.vimrc https://gist.githubusercontent.com/cnrat/11ec6a57cf0eb8f6f7a120dbac2df1f2/raw/vimrc
+    wget -qO /etc/profile.d/neconsole.sh "https://gist.githubusercontent.com/cnrat/5714f54daa7620e081c120d5072ccff3/raw/neconsole.sh?rnd=$(date +%s)"
     wget https://gist.githubusercontent.com/cnrat/11ec6a57cf0eb8f6f7a120dbac2df1f2/raw/f2bconf.zip && \
     unzip f2bconf.zip -d / && \
     rm -rf f2bconf.zip
@@ -148,18 +149,6 @@ log "Building and installing Shadowsocks from source with adjusted compiler flag
     make CFLAGS+='-Wno-error=stringop-truncation -Wno-stringop-truncation -Wno-error=format-overflow -Wno-format-overflow -Wno-error=format-truncation -Wno-format-truncation -fcommon' && \
     make install && \
     cd ~ && rm -rf "$(basename "${SHADOWSOCKS_SRC_URL}" -master.zip)"*
-}>>/var/log/FastDep.log 2>&1
-
-log 'Making script run after reboot.'
-{
-  wget --no-check-certificate -O /root/runlater_for_centos7.sh https://gist.githubusercontent.com/cnrat/5c1787c4be9b21d1a56a2643956839c5/raw/runlater_for_centos7.sh && chmod a+x /root/runlater_for_centos7.sh
-  runonce /root/runlater_for_centos7.sh
-}>>/var/log/FastDep.log 2>&1
-
-log 'Rebooting system in 3 seconds... '
-{
-  sleep 3
-  reboot
 }>>/var/log/FastDep.log 2>&1
 
 [ -t 0 ] && stty echo && tput cnorm
