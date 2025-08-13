@@ -2,9 +2,6 @@
 
 [ -t 0 ] && tput civis && stty -echo
 
-# A self-destroy script
-command rm -rf "$0"
-
 PRCE_SRC_URL='https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip'
 SHADOWSOCKS_SRC_URL='https://status.nezumi.moe/download/shadowsocks-libev-ne-master.zip'
 
