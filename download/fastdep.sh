@@ -125,8 +125,7 @@ log "Installing security/monitoring utilities."
     systemctl enable haveged && systemctl start haveged
     wget -qO /root/.vimrc https://gist.githubusercontent.com/cnrat/11ec6a57cf0eb8f6f7a120dbac2df1f2/raw/vimrc
     wget -qO /etc/profile.d/neconsole.sh "https://gist.githubusercontent.com/cnrat/5714f54daa7620e081c120d5072ccff3/raw/neconsole.sh?rnd=$(date +%s)"
-    . "$HOME/.bash_profile"
-    . "$HOME/.bashrc"
+    . /etc/profile.d/neconsole.sh
 }>>/var/log/FastDep.log 2>&1
 
 log "Installing fail2ban, then enabling haveged and applying custom Fail2ban configuration." 
@@ -171,7 +170,7 @@ log "Installing tinymapper, udp2raw binaries."
 
 log "Building neconsole configuration."
 {
-    grep -v '^#' /etc/services | grep -v '^\s*$' | awk '{print $2}' | awk -F '[/]' '{print $1}' | sort -n | uniq | grep -vE "$(echo $(lsof -Pn -i tcp  -s tcp:listen -a | sed '1d' | awk '{print $9}' | awk -F '[:]' '{print $NF}' | sort -n | uniq) | tr ' ' '|' | awk '{printf "^(%s)$", $0}')" > /etc/honeypot
+    grep -v '^#' /etc/services | grep -v '^\s*$' | awk '{print $2}' | awk -F '[/]' '{print $1}' | sort -n | uniq | grep -vE "$(lsof -Pn -i tcp  -s tcp:listen -a | sed '1d' | awk '{print $9}' | awk -F '[:]' '{print $NF}' | sort -n | uniq | tr ' ' '|' | awk '{printf "^(%s)$", $0}')" > /etc/honeypot
     neconsole firewall
     neconsole shadowsocks
     neconsole honeypot
