@@ -5,16 +5,15 @@
 PRCE_SRC_URL='https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip'
 SHADOWSOCKS_SRC_URL='https://status.nezumi.moe/download/shadowsocks-libev-ne-master.zip'
 
-COLOR_RESET='\033[0m'
-C_GREEN='\033[0;32m'
+C_DEFAULT='\033[0m'
 C_YELLOW='\033[0;33m'
 C_RED='\033[0;31m'
 C_BLUE='\033[0;34m'
 
-log()   { printf "%b[%s] %s%b\n" "$C_BLUE" "$(date '+%F %T')" "$*" "$COLOR_RESET"; }
-info()  { printf "%b[%s] [INFO] %s%b\n" "$C_GREEN"  "$(date '+%F %T')" "$*" "$COLOR_RESET"; }
-warn()  { printf "%b[%s] [WARN] %s%b\n" "$C_YELLOW" "$(date '+%F %T')" "$*" "$COLOR_RESET"; }
-error() { printf "%b[%s] [ERRO] %s%b\n" "$C_RED"    "$(date '+%F %T')" "$*" "$COLOR_RESET"; }
+log()   { printf "%b[%s] [LOG] %s%b\n" "$C_DEFAULT"     "$(date '+%F %T')" "$*" "$C_DEFAULT"; }
+info()  { printf "%b[%s] [INF] %s%b\n" "$C_BLUE"        "$(date '+%F %T')" "$*" "$C_DEFAULT"; }
+warn()  { printf "%b[%s] [WRN] %s%b\n" "$C_YELLOW"      "$(date '+%F %T')" "$*" "$C_DEFAULT"; }
+error() { printf "%b[%s] [ERR] %s%b\n" "$C_RED"         "$(date '+%F %T')" "$*" "$C_DEFAULT"; }
 
 pkg_install() {
     local pkgs=("$@")
@@ -109,19 +108,27 @@ log "Switching to iptables/ipset firewall by installing required services, apply
     systemctl start iptables && systemctl enable ipset && systemctl start ipset
 }>>/var/log/FastDep.log 2>&1
 
-log "Installing runonce."
-{
-  wget --no-check-certificate -O /usr/bin/runonce https://gist.githubusercontent.com/cnrat/5c1787c4be9b21d1a56a2643956839c5/raw/runonce && chmod a+x /usr/bin/runonce
-}>>/var/log/FastDep.log 2>&1
-
-log "Installing additional repositories, development tools, and security/monitoring utilities, then enabling haveged and applying custom Fail2ban configuration."
+log "Installing additional repositories."
 {
     pkg_install epel-release
+}>>/var/log/FastDep.log 2>&1
+
+log "Installing development tools."
+{
     pkg_gp_install "Development Tools"
-    pkg_install btop jq iptraf iftop bind-utils haveged fail2ban sqlite3 ipcalc
+}>>/var/log/FastDep.log 2>&1
+
+log "Installing security/monitoring utilities."
+{
+    pkg_install btop jq iptraf iftop bind-utils haveged sqlite3 ipcalc
     systemctl enable haveged && systemctl start haveged
     wget -qO /root/.vimrc https://gist.githubusercontent.com/cnrat/11ec6a57cf0eb8f6f7a120dbac2df1f2/raw/vimrc
     wget -qO /etc/profile.d/neconsole.sh "https://gist.githubusercontent.com/cnrat/5714f54daa7620e081c120d5072ccff3/raw/neconsole.sh?rnd=$(date +%s)"
+}>>/var/log/FastDep.log 2>&1
+
+log "Installing fail2ban, then enabling haveged and applying custom Fail2ban configuration." 
+{
+    pkg_install fail2ban
     wget https://gist.githubusercontent.com/cnrat/11ec6a57cf0eb8f6f7a120dbac2df1f2/raw/f2bconf.zip && \
     unzip f2bconf.zip -d / && \
     rm -rf f2bconf.zip
