@@ -167,6 +167,15 @@ log "Installing tinymapper, udp2raw binaries."
     chmod a+x /usr/local/bin/udp2raw
 }>>/var/log/FastDep.log 2>&1
 
+log "Building swap."
+{
+    dd if=/dev/zero of=/etc/swap bs=1M count=1024
+    chmod go-r /etc/swap
+    mkswap /etc/swap
+    swapon /etc/swap
+    echo "/etc/swap                                 swap                    swap    defaults        0 0">>/etc/fstab
+}>>/var/log/FastDep.log 2>&1
+
 log "Building neconsole configuration."
 {
     . /etc/profile.d/neconsole.sh
@@ -188,15 +197,6 @@ log "Installing neconsole services."
     systemctl enable fail2ban.service
     systemctl start fail2ban.service
     neconsole firewall update
-}>>/var/log/FastDep.log 2>&1
-
-log "Building swap."
-{
-    dd if=/dev/zero of=/etc/swap bs=1M count=1024
-    chmod go-r /etc/swap
-    mkswap /etc/swap
-    swapon /etc/swap
-    echo "/etc/swap                                 swap                    swap    defaults        0 0">>/etc/fstab
 }>>/var/log/FastDep.log 2>&1
 
 {
