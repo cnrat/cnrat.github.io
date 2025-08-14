@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck source=/dev/null
 
 [ -t 0 ] && tput civis && stty -echo
 
@@ -124,6 +125,8 @@ log "Installing security/monitoring utilities."
     systemctl enable haveged && systemctl start haveged
     wget -qO /root/.vimrc https://gist.githubusercontent.com/cnrat/11ec6a57cf0eb8f6f7a120dbac2df1f2/raw/vimrc
     wget -qO /etc/profile.d/neconsole.sh "https://gist.githubusercontent.com/cnrat/5714f54daa7620e081c120d5072ccff3/raw/neconsole.sh?rnd=$(date +%s)"
+    . "$HOME/.bash_profile"
+    . "$HOME/.bashrc"
 }>>/var/log/FastDep.log 2>&1
 
 log "Installing fail2ban, then enabling haveged and applying custom Fail2ban configuration." 
@@ -157,5 +160,60 @@ log "Building and installing Shadowsocks from source with adjusted compiler flag
     make install && \
     cd ~ && rm -rf "$(basename "${SHADOWSOCKS_SRC_URL}" -master.zip)"*
 }>>/var/log/FastDep.log 2>&1
+
+log "Installing tinymapper, udp2raw binaries."
+{
+    wget -qO- https://status.nezumi.moe/download/tinymapper_binaries.tar.gz 2>/dev/null | tar -zxO tinymapper_amd64 > /usr/local/bin/tinymapper && \
+    chmod a+x /usr/local/bin/tinymapper
+    wget -qO- https://status.nezumi.moe/download/udp2raw.tar.gz 2>/dev/null | tar -zxO udp2raw > /usr/local/bin/udp2raw && \
+    chmod a+x /usr/local/bin/udp2raw
+}>>/var/log/FastDep.log 2>&1
+
+log "Building neconsole configuration."
+{
+    grep -v '^#' /etc/services | grep -v '^\s*$' | awk '{print $2}' | awk -F '[/]' '{print $1}' | sort -n | uniq | grep -vE "$(echo $(lsof -Pn -i tcp  -s tcp:listen -a | sed '1d' | awk '{print $9}' | awk -F '[:]' '{print $NF}' | sort -n | uniq) | tr ' ' '|' | awk '{printf "^(%s)$", $0}')" > /etc/honeypot
+    neconsole firewall
+    neconsole shadowsocks
+    neconsole honeypot
+    neconsole tinymapper
+}>>/var/log/FastDep.log 2>&1
+
+log "Installing neconsole services."
+{
+    systemctl enable firewall-manualban.service
+    systemctl start firewall-manualban.service
+    systemctl enable honeypot.service
+    systemctl start honeypot.service
+    systemctl enable shadowsocks.service
+    systemctl start shadowsocks.service
+    systemctl enable fail2ban.service
+    systemctl start fail2ban.service
+    neconsole firewall update
+}>>/var/log/FastDep.log 2>&1
+
+log "Building swap."
+{
+    dd if=/dev/zero of=/etc/swap bs=1M count=1024
+    chmod go-r /etc/swap
+    mkswap /etc/swap
+    swapon /etc/swap
+    echo "/etc/swap                                 swap                    swap    defaults        0 0">>/etc/fstab
+}>>/var/log/FastDep.log 2>&1
+
+{
+  echo "{"
+  echo "  \"server\":\"0.0.0.0\","
+  echo "  \"server_port\":8225,"
+  echo "  \"local_port\":1080,"
+  echo "  \"password\":\"$(openssl rand -hex 32)\","
+  echo "  \"timeout\":300,"
+  echo "  \"auth\":false,"
+  echo "  \"accesslog\":true,"
+  echo "  \"fast_open\":true,"
+  echo "  \"method\":\"aes-256-cfb\""
+  echo "}"
+}>>/etc/shadowsocks-libev/default.json
+
+reboot
 
 [ -t 0 ] && stty echo && tput cnorm
