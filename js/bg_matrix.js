@@ -1,4 +1,8 @@
 (() => {
+  // 1. 幂等拦截：如果已存在画布或已初始化，直接退出
+  if (document.getElementById('c_matrix') || window.__matrix_rain_inited) return;
+  window.__matrix_rain_inited = true;
+
   const chars = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわゐゑを";
   const fontSize = 10;
   let canvas, ctx, drops, w, h;
@@ -6,6 +10,7 @@
   const init = () => {
     if (!canvas) {
       canvas = document.createElement('canvas');
+      canvas.id = 'c_matrix';
       canvas.style.cssText = 'position:fixed;top:0;left:0;z-index:0;opacity:0.75;pointer-events:none;';
       document.body.appendChild(canvas);
       ctx = canvas.getContext('2d');
